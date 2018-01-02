@@ -1,8 +1,7 @@
 "use strict"
 
 import angular from 'angular';
-import './sass/app.scss';
-
+// import './sass/app.scss';
 
 angular.element(document).ready(
     function () {
@@ -23,7 +22,7 @@ angular.element(document).ready(
         });
 
         var Conf = {
-            basePath: "http://localhost:8080/api",
+            basePath: env.basePath,
             landing: "example.list",
             login: "login"
         };
@@ -163,6 +162,6 @@ angular.module('filters', []);
 
 
 function requireAll(r) {
-    r.keys().forEach(r); 
+    r.keys().forEach(r);
 }
-requireAll(require.context('./', true, /\.js$/));
+requireAll(require.context('./', true, /\.(js|scss)$/));

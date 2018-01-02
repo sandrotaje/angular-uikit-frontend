@@ -2,33 +2,32 @@ var webpack = require("webpack");
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 
 
-module.exports = {
+var config = {
     entry: "./app/app.js",
     output: {
         path: "./dist",
         filename: "bundle.js"
     },
-    devtool: "cheap-module-source-map",
     module: {
-        loaders: [
+        rules: [
             {
                 test: /\.js$/,
-                loader: 'babel-loader',
-                exclude: /node_modules/,
-                query: {
-                    presets: ['es2015']
-                }
+                use: ['ng-annotate-loader', 'babel-loader?presets[]=es2015'],
+                exclude: /node_modules/
             },
             {
                 test: /\.(eot|svg|ttf|woff|woff2|jpg|png|html|json)$/,
-                loader: 'file?name=[path][name].[ext]?[hash]'
+                use: 'file-loader?name=[path][name].[ext]?[hash]'
             },
             {
                 test: /\.scss$/,
-                loaders: ["style-loader", "css-loader", "sass-loader"]
+                use: ["style-loader", "css-loader", "sass-loader"]
             }]
     },
     plugins: [
+        new webpack.DefinePlugin({
+            env: JSON.stringify({basePath: "http//:localhost:8080/api"})
+        }),
         new webpack.ProvidePlugin({
             $: "jquery",
             jQuery: "jquery",
@@ -52,12 +51,24 @@ module.exports = {
                 from: "**/*.jpg"
             }
         ])
-        ,
+    ]
+}
+
+if (process.env.NODE_ENV === 'production') {
+    config.plugins.push(
         new webpack.optimize.UglifyJsPlugin({
             compress: {
                 warnings: false
             },
             comments: false
         })
-    ]
+    )
+} else {
+    config.devtool = "cheap-module-source-map"
+    config.devServer = {
+        inline: true,
+        contentBase: "./dist"
+    }
 }
+
+module.exports = config;
